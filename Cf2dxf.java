@@ -7,6 +7,7 @@ package cf2dxf;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -20,6 +21,7 @@ public class Cf2dxf extends javax.swing.JFrame {
      */
     public Cf2dxf() {
         initComponents();
+        
     }
 
     /**
@@ -37,9 +39,10 @@ public class Cf2dxf extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtNewFile = new javax.swing.JTextField();
+        BtnConvAllDir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("CF2DXF Conversion");
+        setTitle("CF2DXF Conversion v1.15");
 
         btnConvert.setText("Convert to DXF");
         btnConvert.addActionListener(new java.awt.event.ActionListener() {
@@ -55,54 +58,59 @@ public class Cf2dxf extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("File to Convert");
+        jLabel1.setText("File or Directory to Convert");
 
-        jLabel2.setText("Name of New File");
+        jLabel2.setText("Name of New File (Single File Mode)");
+
+        BtnConvAllDir.setText("Convert All CF2s in a Directory");
+        BtnConvAllDir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnConvAllDirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(156, 156, 156)
-                                .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(177, 177, 177)
-                                .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 158, Short.MAX_VALUE))
+                .addGap(0, 130, Short.MAX_VALUE)
+                .addComponent(BtnConvAllDir, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(127, 127, 127))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtCf2File, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtNewFile)
-                            .addComponent(txtCf2File, javax.swing.GroupLayout.Alignment.LEADING))))
+                        .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtNewFile)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(35, 35, 35)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtCf2File, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtNewFile, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addGap(24, 24, 24)
+                .addComponent(BtnConvAllDir, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
+                .addGap(12, 12, 12))
         );
 
         pack();
@@ -120,23 +128,51 @@ public class Cf2dxf extends javax.swing.JFrame {
     if (result == JFileChooser.APPROVE_OPTION) {
       File selectedFile = fileChooser.getSelectedFile();
       sfileIn = fileChooser.getSelectedFile().getName();
-      System.out.println("Selected file: " + sfileIn);
+//System.out.println("Selected file: " + sfileIn);
       txtCf2File.setText(fileChooser.getSelectedFile().getPath().toString() );
       txtNewFile.setText(txtCf2File.getText().replaceAll(".cf2", ".dxf"));
     } else {
-      System.out.println("Cancel Button pressed");
+//System.out.println("Cancel Button pressed");
     }
     // JOptionPane.showMessageDialog(null, "Done");
     // timJFrame.infoBox("YOUR INFORMATION HERE", "TITLE BAR MESSAGE");
     }//GEN-LAST:event_btnSelectActionPerformed
 
     private void btnConvertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConvertActionPerformed
+      //  lblWorking.setVisible(true);      
         convertCls oDxf = new convertCls();
         oDxf.cf2File = txtCf2File.getText();
+        if (txtNewFile.getText().trim().length() < 3) {
+            txtNewFile.setText(txtCf2File.getText().toLowerCase().replace(".cf2", ".dxf"));
+        }
         oDxf.dxfFile = txtNewFile.getText();
+            this.setTitle(this.getTitle() + "   WORKING...");
         oDxf.convertDxf();
+            this.setTitle(this.getTitle() + "   DONE!");
     }//GEN-LAST:event_btnConvertActionPerformed
 
+    
+    
+    private void BtnConvAllDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnConvAllDirActionPerformed
+        GetCf2FilesInDir cf = new GetCf2FilesInDir();
+ 
+        convertCls oDxf = new convertCls();
+        oDxf.cf2File = txtCf2File.getText();        
+        oDxf.batch = true;
+        
+        File[] elements = cf.getCf2FileList(txtCf2File.getText().toString()); //{ "a","a","a","a" };
+        for( int i = 0; i < elements.length; i++) {
+            System.out.println(elements[i].toString());
+            oDxf.cf2File = elements[i].toString();
+            oDxf.dxfFile = elements[i].toString().toLowerCase().replace(".cf2", ".dxf");
+            oDxf.convertDxf();        
+        }
+        
+        JOptionPane.showMessageDialog(null, "Complete", "Convert CF2 Directory" , JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_BtnConvAllDirActionPerformed
+  
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -174,6 +210,7 @@ public class Cf2dxf extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BtnConvAllDir;
     private javax.swing.JButton btnConvert;
     private javax.swing.JButton btnSelect;
     private javax.swing.JLabel jLabel1;

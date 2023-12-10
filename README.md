@@ -16,3 +16,6 @@ If someone would care to add any additional improvements to the code it will be 
 The usual caveat applies; no warrantee is either given or implied with this software, use it at your own risk.
 
 TG 23/11/2019
+
+Directory converrsion and CF2out.lsp added 10/12/2023.
+Obviously CF2out.lsp needs to t=be run from within AutoCAD or a similar CAD program.

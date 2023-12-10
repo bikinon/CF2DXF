@@ -2,6 +2,7 @@ package cf2dxf;
 
 import java.lang.*;
 import java.io.*;
+import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
@@ -12,12 +13,28 @@ public class convertCls extends dxf12objects{
 	public int layer;
 	public double ang;
         public double radius;
-    
-   
+        public boolean batch = false;
+// LINE TYPES
+//0 OTHER ???        
+//1 Cut
+//2 Crease
+//3 Perforation (2 parameters, cut and gap) < Never seen them used
+//4 Score/half cut.
+//40 Rillma/Matrix designs.
+//41 Zipper (3 parameters, length, gap, and angle).
+//42 Cut/Crease (3 parameters, cut, crease, and land length) < Never seen them used or an Interpreter than can read them
+//43 Draw but don’t burn into the die.
+//44 Burn but don’t rule.
+//45 Safety edge (2 parameters, height, and pitch) < As above
+//46 Dimensions.
+//99 Punch lines representing a shape that the punch would be expected to cut.
+        
 	public void convertDxf() {
-		// ***** Draw samples as HPGL files ****
-		// ***** TG - 28/10/97 ****************		THIS VERSION IN JAVA 6/12/2016... mean while 20 years on! :-)
-		
+        // ***** TG - 28/10/97 ********  THIS VERSION IN JAVA 6/12/2016... mean while 20 years on! :-)
+        // Completed 21/03/2019 TG - currently doesn't separate out and name cut/crease & perf
+	// More tweaks & directory conversion added 2023
+        // I still say CF2 is a Poltter file format, it has more in common with HPGL than DXF/DWG
+        
                 double tmpAng;
 		int dirc;
                 String txt = "";
@@ -28,6 +45,7 @@ public class convertCls extends dxf12objects{
 		String[] thevals = new String[15];
 		double v1=0,v2=0,v3=0,v4=0,v5=0,v6=0;
 		
+                dxf = ""; // reset DXF string
 		dxf += dxf_header12();
 				
 		try (BufferedReader br = new BufferedReader(new FileReader(cf2File))) {
@@ -41,8 +59,9 @@ public class convertCls extends dxf12objects{
                         }
                     }
                     
-		      System.out.println(cmd + "*" + line);
-		      if (cmd.equals("L,")) {
+//System.out.println(cmd + "*" + line);
+// L, pointage, LineType, AuxLineType, sx, sy, ex, ey, NoBridges, WidthBridge
+		      if (cmd.equals("L,")) { // LINE
 		            v1=Double.parseDouble(thevals[4]); // start X
 		            v2=Double.parseDouble(thevals[5]); // start Y
 		            v3=Double.parseDouble(thevals[6]) - v1; // End X
@@ -55,7 +74,7 @@ public class convertCls extends dxf12objects{
 		            Line(v3, v4, Integer.toString(this.layer));
 		      }// if cmd='L,'
 		      
-		      if (cmd.equals("A,")) {
+		      if (cmd.equals("A,")) { // ARC
                             //0 =                                                           - is the pointage in points (1/72 inches).
 		            v1=Double.parseDouble(thevals[4]); // start X                   - the start coordinate of the arc. X
 		            v2=Double.parseDouble(thevals[5]); // start Y                   - the start coordinate of the arc. Y
@@ -63,6 +82,9 @@ public class convertCls extends dxf12objects{
 		            v4=Double.parseDouble(thevals[7]); // End Y                     - the end coordinate of the arc Y
 		            v5=Double.parseDouble(thevals[8]); // Centre X
 		            v6=Double.parseDouble(thevals[9]); // Centre Y
+                                if (thevals[10].equals("1.0000")) { // Quick and DIRTY Fix do better later MUST be INT
+                                    thevals[10] = "1";
+                                }
 		            dirc =  Integer.parseInt(thevals[10]); // Direction of rotation
 		            layer = Integer.parseInt(thevals[2]);  // Layer / pen           - is the common file linetype
 		            auxLT = Integer.parseInt(thevals[3]); // Auxillery line type    - the common file auxiliary linetype
@@ -100,8 +122,8 @@ public class convertCls extends dxf12objects{
 		            auxLT = Integer.parseInt(thevals[3]); // Auxillery line type    - the common file auxiliary linetype
                             
                             txt = br.readLine();
-				   System.out.println(cmd + "*" + line);
-                            TextInsert(v1, v2, txt, String.valueOf(v4), String.valueOf(layer));
+//System.out.println(cmd + "*" + line + ">>>>> ANGLE=" + v3 + "**" + String.valueOf(v3));
+                            TextInsert(v1, v2, txt, String.valueOf(v4), String.valueOf(layer), String.valueOf(v3));
 			  }
                           
                     cmd = "";      
@@ -109,7 +131,10 @@ public class convertCls extends dxf12objects{
 		  }  // while
 
 		} catch (IOException e) {
-			e.printStackTrace(); // auto close of file
+                    // e.printStackTrace(); // auto close of file
+                    JOptionPane.showMessageDialog(null, Arrays.toString(e.getStackTrace()), "convertDxf.MainLoop", JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {  
+                    JOptionPane.showMessageDialog(null, e.toString(), "convertDxf.MainLoop", JOptionPane.ERROR_MESSAGE);                    
 		}
 		
 	    // dxf += dxf_footer12(); WONT PRINT!
@@ -124,15 +149,18 @@ public class convertCls extends dxf12objects{
 			bw.write(dxf);
 			//bw.close(); // no need to close it.
 		} catch (IOException e) {
-			e.printStackTrace();
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(null, Arrays.toString(e.getStackTrace()), "convertDxf.BufferedWriter", JOptionPane.ERROR_MESSAGE);                        
 		}
 		
-                String msg = "CONVERTED:\n" + cf2File + "\n\nConverted to DXF\n";
-                msg += "This program performs a standard Layer conversion from the CF2 spec.\n";
-                msg += "It doesn't follow that whoever created your file did the same.\n";
-                msg += "Note - Rarer commands such as Scale\nare not dealt with in this program.";
-		JOptionPane.showMessageDialog(null, msg, "CF2 to DXF by Tim Gathercole 1997-2019", JOptionPane.INFORMATION_MESSAGE ); //  28/10/1997 - 21/03/2019
-
+                if (batch = false) {
+                    String msg = "CONVERTED:\n" + cf2File + "\n\nConverted to DXF\n";
+                    msg += "This program performs a standard Layer conversion from the CF2 spec.\n";
+                    msg += "It doesn't follow that whoever created your file did the same.\n\n";
+                    msg += "Note - Rarer commands such as Scale\nare not dealt with in this program.\n";
+                    msg += "Cut/Crease & Perf are put onto generic layers.";
+                    JOptionPane.showMessageDialog(null, msg, "CF2 to DXF by Tim Gathercole 1997-2019      timgathercole@zoho.com", JOptionPane.INFORMATION_MESSAGE ); //  28/10/1997 - 21/03/2019
+                }
 		
 	}
 
@@ -152,7 +180,8 @@ protected double find_Ang_Rad(double absX, double absY, double xc, double yc, in
   double rad=0; 
   double aplus=0, wrx=0, wry=0;
 
-
+try {    
+  
 rx = absX - xc;
 ry = absY - yc;
 if (rx == 0) {
@@ -208,6 +237,9 @@ radius = rad;
    rtnAng = rtnAng+aplus;
    if (rtnAng > 360) { rtnAng = rtnAng-360;}
 
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "find_Ang_Rad", JOptionPane.ERROR_MESSAGE);                        
+}
    return rtnAng;
 } // find_Ang_Rad
 

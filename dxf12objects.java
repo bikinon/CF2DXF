@@ -1,11 +1,13 @@
 package cf2dxf;
 
+import javax.swing.JOptionPane;
+
 /**
   *
   * Description
-  *
-  * @version 1.0 from 7/30/2016
-  * @author Tim Gathercole
+  * @version 1.01 from 7/30/2016
+  * @author TG
+  * Keeping it simple with DXF version 12
   */
 
 public class dxf12objects {
@@ -228,7 +230,7 @@ dxf +="ENDTAB"+ cr;
     dxf +="ENTITIES"+ cr;
     
     return dxf;
-  }
+  } // dxf_header12
   
   
   protected String dxf_footer12() {
@@ -253,6 +255,7 @@ dxf +="ENDTAB"+ cr;
     // eColor    = Colour to use
     // eLinetype = Line type to use
     //echo xval.'*'.yval.'*'.layer.'*'.eColor.'*'.eLinetype.'<br>';
+try {
     String cr = "\r\n";
     String layCol[] = this.getLayer(layer);
     
@@ -284,8 +287,13 @@ dxf +="ENDTAB"+ cr;
     xabs = xabs + xval * Xaxis;
     yabs = yabs + yval * Yaxis;
     hndl = hndl + 1;
+    
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "Line", JOptionPane.ERROR_MESSAGE);                        
+}   
+
     return false;
-  }
+  } // Line
   
   
   protected String[] getLayer(String layer) {
@@ -305,7 +313,10 @@ dxf +="ENDTAB"+ cr;
 46 Dimensions.
 99 Punch lines representing a shape that the punch would be expected to cut.
     */
+ 
     String rtn[] = {"CUT","1"};
+
+try {       
     switch (layer) {
       case "1" : 
         rtn[0] = "CUT";  // Artios understands Colour 7 as CUT   
@@ -358,10 +369,14 @@ dxf +="ENDTAB"+ cr;
       default: 
         rtn[0] = "OTHER";
         rtn[1] = "7";
-System.out.println(layer);
     } // end of switch
+    
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "getLayer", JOptionPane.ERROR_MESSAGE);                        
+} 
+
     return rtn;  
-  }
+  } // getLayer
   
   protected boolean circle(double XcenterAbs, double YcenterAbs, double radius, String layer, int eColor) {
     /*
@@ -369,7 +384,8 @@ System.out.println(layer);
     */
     String cr = "\r\n";
     String layCol[] = this.getLayer(layer);
-    
+
+try {    
     dxf +="  0"+ cr;
     dxf +="CIRCLE"+ cr;
     
@@ -395,8 +411,12 @@ System.out.println(layer);
     //  Finish
     hndl = hndl + 1;
     
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "circle", JOptionPane.ERROR_MESSAGE);                        
+}
+
     return true;
-  }
+  } // circle
   
   /**
   * 
@@ -413,7 +433,8 @@ System.out.println(layer);
   protected boolean arc2(double XcenterAbs, double YcenterAbs, double radius, double startAngle, double endAngle, double endPosX, double endPosY, String layer) {
     String cr = "\r\n";
     String layCol[] = this.getLayer(layer);
-    
+ 
+try {    
     dxf +="  0" + cr;
     dxf +="ARC" + cr;
     
@@ -447,7 +468,11 @@ System.out.println(layer);
     xabs = xabs + endPosX;
     yabs = yabs + endPosY;
     hndl += 1;
-    
+
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "arc2", JOptionPane.ERROR_MESSAGE);                        
+}
+
     return false;
   }
   
@@ -471,7 +496,8 @@ System.out.println(layer);
     double tmp = 0;
     double strang = 0;
     double endang = 0;
-    
+
+try {    
     if (rx == 0) {
       angle = 180; // simple 180 arc
       //  rad = Abs(ry);
@@ -537,20 +563,25 @@ System.out.println(layer);
     rtnArray[1] = ry; // Ycenter
     rtnArray[2] = strang; // startAngle
     rtnArray[3] = endang; // endAngle
-    
+
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "getArcAngles", JOptionPane.ERROR_MESSAGE);                        
+}
+
     return rtnArray;
   } // getArcAngles
 
 
 /**
-   * 
-   * @param xval
-   * @param yval
-   * @param textStr
-   * @param layer
-   * @return
-   */
-  protected boolean TextInsert(double xval, double yval, String textStr, String textSz, String layer) {
+ * 
+ * @param xval
+ * @param yval
+ * @param textStr
+ * @param textSz
+ * @param layer
+ * @param textAngle 
+ */
+  protected void TextInsert(double xval, double yval, String textStr, String textSz, String layer, String textAngle) {
     // DXF version 12
     // xval    = Incremental X movement
     // yval    = Incremental Y movement
@@ -560,6 +591,7 @@ System.out.println(layer);
     String cr = "\r\n";
     String layCol[] = this.getLayer(layer);
 
+try {    
     dxf +="  0" + cr;
     dxf +="TEXT" + cr;
     dxf +="  5" + cr; //  Drawing Datadbase Handle
@@ -583,18 +615,22 @@ System.out.println(layer);
     
     dxf +=" 41" + cr; // Line Type
     dxf +="0" + cr;
-    dxf +=" 50" + cr; // Line Type
-    dxf +="0" + cr;    
+    dxf +=" 50" + cr; // Line Angle?
+    dxf += textAngle + cr;    
     
     dxf +=" 1" + cr; //  
     dxf += textStr + cr;
     dxf +=" 72" + cr;
-    dxf +="0" + cr;    
+    dxf += "0" + cr;    
     //  Finish
 //    xabs = xabs + xval * Xaxis; Don
 //    yabs = yabs + yval * Yaxis;
     hndl = hndl + 1;
-    return false;
+
+} catch (Exception e) {
+    JOptionPane.showMessageDialog(null, e.toString(), "TextInsert", JOptionPane.ERROR_MESSAGE);                        
+}
+
   } // TextInsert  
 
   
